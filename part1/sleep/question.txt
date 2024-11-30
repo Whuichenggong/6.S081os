@@ -1,0 +1,22 @@
+查看user/中的一些其他程序 （例如，user/echo.c，user/grep.c和user/rm.c）
+了解如何获取传递给程序的命令行参数。
+
+如果用户忘记传递参数，sleep 应该打印一条错误消息。
+
+命令行参数以字符串形式传递；您可以使用atoi将其转换为整数（参见 user/ulib.c）。
+
+使用系统调用sleep。
+
+请参阅kernel/sysproc.c了解实现sleep系统调用（查找sys_sleep）的xv6 内核代码，
+
+参阅 user/user.h了解可从用户程序调用的sleep 的 C 定义
+
+参阅user/usys.S
+
+了解从用户代码跳转到内核执行sleep的汇编代码。
+
+确保main调用exit()来退出程序。
+
+将您的睡眠程序添加到Makefile 中的UPROGS；完成后，make qemu将编译您的程序，您将能够从 xv6 shell 运行它。
+
+阅读 Kernighan 和 Ritchie 的书《C 编程语言（第二版）》（K&R）来了解 C。

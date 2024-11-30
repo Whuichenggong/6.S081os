@@ -1,0 +1,39 @@
+#include "kernel/types.h"
+#include "user/user.h"
+
+int main(int argc,char **argv)
+{
+if(argc==1){
+        fprintf(2,"你必须给我一个参数去我才知道睡多长时间是不？\n");
+        exit(1);
+}
+if(argc!=2){
+        fprintf(2,"sleep.c:我只想你提供一个睡眠时间,你给了我 %d 个参数不太行！\n",argc-1);
+        exit(1);
+}
+int time;
+time = atoi(argv[1]);
+if(time<=0){
+exit(1);
+}
+sleep(time);
+exit(0);
+
+}
+
+解释下面的几段代码
+
+time = atoi(argv[1]);
+这行代码使用 atoi 函数（字符串转整数函数）将命令行参数 argv[1]（argv 是 C 语言中用来存储命令行参数的数组，argv[0] 是程序的名称，argv[1] 是第一个参数，依此类推）转换成一个整数，并将其赋值给变量 time。
+
+也就是你传入的任何数字都是字符串需要 操作系统将字符串转换成整数 进而获取sleep time
+
+if(time<=0){
+    exit(1);
+}
+这是一个条件判断语句。如果 time 的值小于或等于 0，程序将调用 exit 函数，并传递参数 1，表示程序异常退出（非零值表示异常退出）。
+
+sleep(time);
+如果 time 大于 0，程序将调用 sleep 函数，使程序暂停执行 time 指定的秒数。sleep 函数接受一个整数参数，表示要暂停的秒数。
+
+exit(0);
