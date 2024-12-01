@@ -1,39 +1,49 @@
+参考资料 https://www.geeksforgeeks.org/pipe-system-call/
+
+
 #include "kernel/types.h"
+#include "kernel/stat.h"
 #include "user/user.h"
 
-int main(int argc,char **argv)
+int main (int argc,char *argv[])
 {
-if(argc==1){
-        fprintf(2,"你必须给我一个参数去我才知道睡多长时间是不？\n");
-        exit(1);
+        int child_fd[2],parent_fd[2];
+        char buf[1];
+        pipe(child_fd);
+        pipe(parent_fd);
+        int pid = fork();
+        if(pid == 0){
+        close(child_fd[0]);
+        close(parent_fd[1]);
+        read(parent_fd[0],buf,sizeof(buf));
+        close(parent_fd[0]);
+        fprintf(2,"%d:received ping\n",getpid());
+        write(child_fd[1],"x",sizeof("x"));
+        close(child_fd[1]);
+}else {
+        close(parent_fd[0]);
+        close(child_fd[1]);
+        write(parent_fd[1],"x",sizeof("x"));
+        close(parent_fd[1]);
+        read(child_fd[0],buf,sizeof(buf));
+        close(child_fd[0]);
+        fprintf(2,"%d: received pong\n",getpid());
 }
-if(argc!=2){
-        fprintf(2,"sleep.c:我只想你提供一个睡眠时间,你给了我 %d 个参数不太行！\n",argc-1);
-        exit(1);
-}
-int time;
-time = atoi(argv[1]);
-if(time<=0){
-exit(1);
-}
-sleep(time);
+
 exit(0);
 
 }
 
-解释下面的几段代码
+fork（）创建新的进程 新进程将成为原进程的子进程
+close（）不用哪个关哪个
+read（）从进程中读取数据
+rite(child_fd[1],"x",sizeof("x"));向父进程中发送数据 向子进程管道写入x
 
-time = atoi(argv[1]);
-这行代码使用 atoi 函数（字符串转整数函数）将命令行参数 argv[1]（argv 是 C 语言中用来存储命令行参数的数组，argv[0] 是程序的名称，argv[1] 是第一个参数，依此类推）转换成一个整数，并将其赋值给变量 time。
+子进程的读和写
+父进程的读和写
 
-也就是你传入的任何数字都是字符串需要 操作系统将字符串转换成整数 进而获取sleep time
+如果是子进程则 子进程写入父进程 父进程读   0读1写
+如果是父进程则 父进程写入子进程 子进程读
 
-if(time<=0){
-    exit(1);
-}
-这是一个条件判断语句。如果 time 的值小于或等于 0，程序将调用 exit 函数，并传递参数 1，表示程序异常退出（非零值表示异常退出）。
-
-sleep(time);
-如果 time 大于 0，程序将调用 sleep 函数，使程序暂停执行 time 指定的秒数。sleep 函数接受一个整数参数，表示要暂停的秒数。
-
-exit(0);
+总结：创建了两个管道，一个用于父子进程之间通信（child_fd），另一个用于父进程和子进程之间通信（parent_fd）。父进程向子进程发送 "ping" 消息（即一个 "x"），子进程收到后打印消息并回复 "pong"（即另一个 "x"），父进程收到 "pong" 后也打印消息。这个过程展示了进程间的通信机制。
+                                  
